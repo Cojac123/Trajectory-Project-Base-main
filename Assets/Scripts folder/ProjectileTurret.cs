@@ -44,8 +44,11 @@ public class ProjectileTurret : MonoBehaviour
     {
         GameObject projectile = Instantiate(projectilePrefab, barrelEnd.position, gun.transform.rotation);
         Rigidbody rb = projectile.GetComponent<Rigidbody>();
-        rb.linearVelocity = projectileSpeed * barrelEnd.forward; // ? FIXED (was "linearVelocity")
+        rb.velocity = projectileSpeed * barrelEnd.forward;
+
+
     }
+
 
     // -----------------------------
     // ??? Aim at where the mouse hits
