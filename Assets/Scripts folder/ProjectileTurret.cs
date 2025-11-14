@@ -44,7 +44,7 @@ public class ProjectileTurret : MonoBehaviour
     {
         GameObject projectile = Instantiate(projectilePrefab, barrelEnd.position, gun.transform.rotation);
         Rigidbody rb = projectile.GetComponent<Rigidbody>();
-        rb.velocity = projectileSpeed * barrelEnd.forward;
+        rb.linearVelocity = projectileSpeed * barrelEnd.forward;
 
 
     }
@@ -93,16 +93,21 @@ public class ProjectileTurret : MonoBehaviour
 
         Vector3 startPos = barrelEnd.position;
         Vector3 startVelocity = projectileSpeed * barrelEnd.forward;
-        float timeStep = 0.1f;  // Smaller = smoother curve
+        float timeStep = 0.1f;
         float maxTime = 5f;
+
+        Vector3 accel = new Vector3(0, gravity.y * -1, 0); // Reverse gravity for correct arc
 
         for (float t = 0; t < maxTime; t += timeStep)
         {
-            // Calculate next point using kinematic equation
-            Vector3 newPoint = startPos + (startVelocity * t) + (0.5f * gravity * t * t);
+            // Calculate displacement using kinematic equation
+            Vector3 displacement = (startVelocity * t) + (0.5f * accel * (t * t));
 
-            // Stop drawing if it hits something
-            if (Physics.Raycast(startPos, newPoint - startPos, out RaycastHit hit, (newPoint - startPos).magnitude, targetLayer))
+            Vector3 newPoint = barrelEnd.position + displacement;
+
+            // Stop drawing if a collision happens
+            if (Physics.Raycast(startPos, newPoint - startPos, out RaycastHit hit,
+                (newPoint - startPos).magnitude, targetLayer))
             {
                 points.Add(hit.point);
                 break;
@@ -116,6 +121,7 @@ public class ProjectileTurret : MonoBehaviour
         line.positionCount = points.Count;
         line.SetPositions(points.ToArray());
     }
+
 
     // -----------------------------
     // ?? Calculate launch angle for turret
